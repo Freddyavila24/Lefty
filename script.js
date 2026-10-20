@@ -4,7 +4,10 @@ const siteNav = document.querySelector("#site-nav");
 menuToggle.addEventListener("click", () => {
   const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
   menuToggle.setAttribute("aria-expanded", String(!isOpen));
-  menuToggle.setAttribute("aria-label", isOpen ? "Open navigation" : "Close navigation");
+  menuToggle.setAttribute(
+    "aria-label",
+    isOpen ? "Open navigation" : "Close navigation",
+  );
   siteNav.classList.toggle("is-open", !isOpen);
 });
 
@@ -16,28 +19,33 @@ siteNav.querySelectorAll("a").forEach((link) => {
   });
 });
 
-document.querySelector("#year").textContent = new Date().getFullYear();
 
-const dateInput = document.querySelector("#date");
-const localToday = new Date();
-localToday.setMinutes(localToday.getMinutes() - localToday.getTimezoneOffset());
-dateInput.min = localToday.toISOString().slice(0, 10);
 
-document.querySelector("#booking-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  if (!form.reportValidity()) return;
+document.querySelectorAll(".gallery-slider").forEach((slider) => {
+  const slides = slider.querySelectorAll(".slide");
+  const prevButton = slider.querySelector(".prev");
+  const nextButton = slider.querySelector(".next");
+  const counter = slider.querySelector(".slide-count");
 
-  const formData = new FormData(form);
-  const name = formData.get("name").trim();
-  const service = formData.get("service");
-  const date = new Date(`${formData.get("date")}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
+  let currentIndex = 0;
+
+  function showSlide(index) {
+    currentIndex = (index + slides.length) % slides.length;
+
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === currentIndex);
+    });
+
+    counter.textContent = `${currentIndex + 1} / ${slides.length}`;
+  }
+
+  nextButton.addEventListener("click", () => {
+    showSlide(currentIndex + 1);
   });
-  document.querySelector("#form-message").textContent =
-    `Thanks, ${name}. Your request for "${service}" on ${date} is ready — call (718) 555-0142 to confirm your chair.`;
-  form.reset();
-  dateInput.min = localToday.toISOString().slice(0, 10);
+
+  prevButton.addEventListener("click", () => {
+    showSlide(currentIndex - 1);
+  });
+
+  showSlide(0);
 });
